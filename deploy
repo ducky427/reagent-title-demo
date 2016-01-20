@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+readonly TMP_DIR=$(mktemp -d /tmp/reagent-title-demo.XXXXXX)
+readonly REPO=https://github.com/ducky427/reagent-title-demo.git
+readonly GIT="git -C $TMP_DIR"
+readonly COMMIT_MSG="Update to latest build"
+
+log() {
+  echo "deploy: $1"
+}
+
+main() {
+  log "Compile to Javascript"
+  lein build
+
+  log "Clone $REPO"
+  git clone -q "$REPO" "$TMP_DIR"
+
+  log "Checkout gh-pages"
+  $GIT checkout -q gh-pages
+
+  log "Remove old assets"
+  rm -rf "$TMP_DIR/css"
+  rm -rf "$TMP_DIR/js"
+
+  log "Copy new assets"
+  cp -r resources/public/css "$TMP_DIR"
+  cp -r resources/public/js "$TMP_DIR"
+
+  log "Copy index.html"
+  cp resources/public/index.html "$TMP_DIR"
+
+  log "Commit: $COMMIT_MSG"
+  $GIT add -A
+  $GIT commit -q -m "$COMMIT_MSG"
+
+  log "Push gh-pages"
+  $GIT push -q origin gh-pages
+
+  log "Remove temp directory"
+  rm -rf "$TMP_DIR"
+}
+
+main "$@"

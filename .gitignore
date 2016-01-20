@@ -1,0 +1,8 @@
+pom.xml
+figwheel_server.log
+*jar
+/target/
+.lein-deps-sum
+.lein-repl-history
+.lein-plugins/
+/resources/public/js/compiled/**
